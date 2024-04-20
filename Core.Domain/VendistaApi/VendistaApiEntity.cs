@@ -49,7 +49,18 @@ public class VendistaApiEntity : IDisposable
 
     public int[] GetIDsOfAllTerminals()
     {
+        var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, VendistaApiUrls.Terminals(_token));
+        httpRequestMessage.Headers.Add("Accept", "text/plain");
+
+        var httpResponseMessage = await _httpClient.SendAsync(httpRequestMessage);
         
+        httpRequestMessage.Dispose();
+
+        var deserializedJsonResponse = JObject.Parse(await httpResponseMessage.Content.ReadAsStringAsync())
+
+        httpResponseMessage.Dispose();
+
+        return deserializedJsonResponse["items"].Children().Select(terminalJsonResponse => (int)terminalJsonResponse["id"]);
     }
     
     public async Task<CommandsResponseJson> GetAllCommands()
