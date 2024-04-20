@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 
 namespace Core.Domain.VendistaApi.JsonModels.Responses;
 
-public class TokenResponse
+public class TokenResponseJson
 {
     [JsonProperty("token")]
     public string Token { get; set; }

@@ -1,12 +1,13 @@
 using System.Net;
+using Core.Domain.VendistaApi.JsonModels.Requests;
 using Core.Domain.VendistaApi.JsonModels.Responses;
 using Newtonsoft.Json;
 
 namespace Core.Domain.VendistaApi;
 
-public class VendistaApi : IDisposable
+public class VendistaApiEntity : IDisposable
 {
-    public VendistaApi(HttpClient httpClient)
+    public VendistaApiEntity(HttpClient httpClient)
     {
         _httpClient = httpClient;
         _httpClient.BaseAddress = new Uri(VendistaApiUrls.Root);
@@ -43,7 +44,7 @@ public class VendistaApi : IDisposable
         
         httpResponseMessage.Dispose();
         
-        return JsonConvert.DeserializeObject<TokenResponse>(serializedJsonResponse)!.Token;
+        return JsonConvert.DeserializeObject<TokenResponseJson>(serializedJsonResponse)!.Token;
     }
 
     public int[] GetIDsOfAllTerminals()
@@ -51,9 +52,20 @@ public class VendistaApi : IDisposable
         
     }
     
-    public int[] GetAllCommands()
+    public async Task<CommandsResponseJson> GetAllCommands()
     {
+        var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, VendistaApiUrls.CommandTypes(_token));
+        httpRequestMessage.Headers.Add("Accept", "text/plain");
+
+        var httpResponseMessage = await _httpClient.SendAsync(httpRequestMessage);
         
+        httpRequestMessage.Dispose();
+
+        var serializedJsonResponse = await httpResponseMessage.Content.ReadAsStringAsync();
+        
+        httpResponseMessage.Dispose();
+
+        return JsonConvert.DeserializeObject<CommandsResponseJson>(serializedJsonResponse)!;
     }
 
     public int[] GetCommandsByTerminal()
@@ -61,9 +73,16 @@ public class VendistaApi : IDisposable
 
     }
 
-    public bool SendCommandToTerminal()
+    public async Task SendCommandToTerminal(int terminalId, CommandRequestJson commandRequestJson)
     {
-        
+        var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, VendistaApiUrls.TerminalCommands(_token, terminalId));
+        httpRequestMessage.Headers.Add("Accept", "text/plain");
+        httpRequestMessage.Headers.Add("Content-Type", "application/json-patch+json");
+        httpRequestMessage.Content = new StringContent(JsonConvert.SerializeObject(commandRequestJson));
+
+        var httpResponseMessage = await _httpClient.SendAsync(httpRequestMessage);
+        httpRequestMessage.Dispose();
+        httpResponseMessage.Dispose();
     }
     
     public void Dispose() => _httpClient.Dispose();

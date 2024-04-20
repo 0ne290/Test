@@ -1,5 +1,4 @@
-using Core.Domain;
-using Core.Domain.VendistaApi;
+using Core.Application.VendistaApi;
 
 namespace Web.Middlewares;
 
@@ -7,9 +6,9 @@ public class VendistaApiTokenValidator
 {
     public VendistaApiTokenValidator(RequestDelegate next) => _next = next;
  
-    public async Task InvokeAsync(HttpContext context, VendistaApi vendistaApi)
+    public async Task InvokeAsync(HttpContext context, VendistaApiInteractor vendistaApi)
     {
-        vendistaApi.ValidateToken();
+        await vendistaApi.ValidateToken();
         
         await _next.Invoke(context);
     }

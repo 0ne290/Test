@@ -1,4 +1,4 @@
-using Core.Domain;
+using Core.Application.VendistaApi;
 using Core.Domain.VendistaApi;
 
 namespace Web;
@@ -12,7 +12,7 @@ internal static class Program
         // Add services to the container.
         builder.Services.AddControllersWithViews();
         builder.Services.AddHttpClient();
-        builder.Services.AddScoped<VendistaApi>(serviceProvider => new VendistaApi(serviceProvider.GetService<IHttpClientFactory>()!.CreateClient()));
+        builder.Services.AddScoped<VendistaApiInteractor>(serviceProvider => new VendistaApiInteractor(new VendistaApiEntity(serviceProvider.GetService<IHttpClientFactory>()!.CreateClient())));
 
         var app = builder.Build();
 
