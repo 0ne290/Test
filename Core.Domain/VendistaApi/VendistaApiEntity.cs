@@ -47,7 +47,7 @@ public class VendistaApiEntity : IDisposable
         return JsonConvert.DeserializeObject<TokenResponseJson>(serializedJsonResponse)!.Token;
     }
 
-    public int[] GetIDsOfAllTerminals()
+    public async Task<TerminalsResponseJson> GetAllTerminals()
     {
         var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, VendistaApiUrls.Terminals(_token));
         httpRequestMessage.Headers.Add("Accept", "text/plain");
@@ -56,11 +56,11 @@ public class VendistaApiEntity : IDisposable
         
         httpRequestMessage.Dispose();
 
-        var deserializedJsonResponse = JObject.Parse(await httpResponseMessage.Content.ReadAsStringAsync())
+        var deserializedJsonResponse = JsonConvert.DeserializeObject<TerminalsResponseJson>(await httpResponseMessage.Content.ReadAsStringAsync());
 
         httpResponseMessage.Dispose();
 
-        return deserializedJsonResponse["items"].Children().Select(terminalJsonResponse => (int)terminalJsonResponse["id"]);
+        return deserializedJsonResponse!;
     }
     
     public async Task<CommandsResponseJson> GetAllCommands()
@@ -79,9 +79,20 @@ public class VendistaApiEntity : IDisposable
         return JsonConvert.DeserializeObject<CommandsResponseJson>(serializedJsonResponse)!;
     }
 
-    public int[] GetCommandsByTerminal()
+    public async Task<TerminalCommandsResponseJson> GetCommandsByTerminal(int terminalId)
     {
+        var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, VendistaApiUrls.TerminalCommands(_token, terminalId));
+        httpRequestMessage.Headers.Add("Accept", "text/plain");
 
+        var httpResponseMessage = await _httpClient.SendAsync(httpRequestMessage);
+        
+        httpRequestMessage.Dispose();
+
+        var serializedJsonResponse = await httpResponseMessage.Content.ReadAsStringAsync();
+        
+        httpResponseMessage.Dispose();
+
+        return JsonConvert.DeserializeObject<TerminalCommandsResponseJson>(serializedJsonResponse)!;
     }
 
     public async Task SendCommandToTerminal(int terminalId, CommandRequestJson commandRequestJson)

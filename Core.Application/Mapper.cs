@@ -3,7 +3,7 @@ using Core.Application.VendistaApi.Dto.Responses;
 using Core.Domain.VendistaApi.JsonModels.Requests;
 using Core.Domain.VendistaApi.JsonModels.Responses;
 
-namespace Core.Application.VendistaApi;
+namespace Core.Application;
 
 public static class Mapper
 {

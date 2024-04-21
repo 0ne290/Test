@@ -2,10 +2,10 @@ using Newtonsoft.Json;
 
 namespace Core.Domain.VendistaApi.JsonModels.Responses;
 
-public class CommandsResponseJson : PageBaseJson
+public class TerminalsResponseJson : PageBaseJson
 {
     [JsonProperty("items")]
-    public List<CommandResponseJson> Items { get; set; }
+    public List<TerminalResponseJson>? Items { get; set; }
     
     [JsonProperty("success")]
     public bool Success { get; set; }
