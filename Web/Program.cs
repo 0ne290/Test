@@ -1,6 +1,7 @@
 using Core.Application.VendistaApi;
 using Core.Application.VendistaApi.Dto.Requests;
 using Core.Domain.VendistaApi;
+using Web.Middlewares;
 
 namespace Web;
 
@@ -8,7 +9,7 @@ internal static class Program
 {
     private static async Task Main(string[] args)
     {
-        var x = new VendistaApiInteractor(new VendistaApiEntity(new HttpClient()));
+        /*var x = new VendistaApiInteractor(new VendistaApiEntity(new HttpClient()));
 
         await x.ValidateToken();
 
@@ -50,7 +51,7 @@ internal static class Program
         
         x.Dispose();
         
-        return;
+        return;*/
         
         var builder = WebApplication.CreateBuilder(args);
 
@@ -79,7 +80,9 @@ internal static class Program
         app.MapControllerRoute(
             name: "default",
             pattern: "{controller=Home}/{action=Index}/{id?}");
+        
+        app.UseMiddleware<VendistaApiTokenValidator>();
 
-        app.Run();
+        await app.RunAsync();
     }
 }

@@ -1,8 +1,36 @@
-﻿@{
+﻿@using Core.Application.VendistaApi.Dto.Responses
+@{
     ViewData["Title"] = "Home Page";
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+        @foreach (var x in (IEnumerable<int>)ViewData["TerminalIDs"]!)
+        {
+            @x<br>
+        }
+</div>
+<div class="text-center">
+    @{
+        foreach (var x in (CommandResponseDto[])ViewData["Commands"]!)
+        {
+            var xc = "";
+            foreach (var eey1 in x.DefaultIntValues)
+            {
+                xc += eey1.Key + " := ";
+                xc += eey1.Value + "; ";
+            }
+
+            var xt = "";
+            foreach (var eey1 in x.DefaultStringValues)
+            {
+                xt += eey1.Key + " := ";
+                xt += eey1.Value + "; ";
+            }
+
+            var y = $"{x.Id}; {x.Name}; {{ {xc}}}; {{ {xt}}}";
+
+            @y<br>
+        }
+    }
+    
 </div>
