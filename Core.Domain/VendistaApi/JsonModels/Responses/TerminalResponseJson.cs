@@ -23,7 +23,7 @@ public class TerminalResponseJson
     public int GsmRssi { get; set; }
     
     [JsonProperty("imei")]
-    public int Imei { get; set; }
+    public long Imei { get; set; }
     
     [JsonProperty("partner_id")]
     public int PartnerId { get; set; }
@@ -53,7 +53,7 @@ public class TerminalResponseJson
     public float? BonusPercent { get; set; }
     
     [JsonProperty("qr_discount_percent")]
-    public float? QrDiscountPercent { get; set; }
+    public float QrDiscountPercent { get; set; }
     
     [JsonProperty("send_cash")]
     public bool SendCash { get; set; }
@@ -98,7 +98,7 @@ public class TerminalResponseJson
     public bool DisableFirmwareUpdates { get; set; }
     
     [JsonProperty("comment")]
-    public int? Comment { get; set; }
+    public string? Comment { get; set; }
     
     [JsonProperty("owner_id")]
     public int OwnerId { get; set; }

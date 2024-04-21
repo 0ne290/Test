@@ -99,10 +99,14 @@ public class VendistaApiEntity : IDisposable
     {
         var httpRequestMessage = new HttpRequestMessage(HttpMethod.Post, VendistaApiUrls.TerminalCommands(_token, terminalId));
         httpRequestMessage.Headers.Add("Accept", "text/plain");
-        httpRequestMessage.Headers.Add("Content-Type", "application/json-patch+json");
         httpRequestMessage.Content = new StringContent(JsonConvert.SerializeObject(commandRequestJson));
+        httpRequestMessage.Content.Headers.Remove("Content-Type");
+        httpRequestMessage.Content.Headers.Add("Content-Type", "application/json-patch+json");
 
         var httpResponseMessage = await _httpClient.SendAsync(httpRequestMessage);
+        
+        //Console.WriteLine(await httpResponseMessage.Content.ReadAsStringAsync());
+        
         httpRequestMessage.Dispose();
         httpResponseMessage.Dispose();
     }

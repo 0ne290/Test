@@ -8,7 +8,7 @@ public class CommandResponseJson
     public int Id { get; set; }
     
     [JsonProperty("name")]
-    public string Name { get; set; }
+    public string? Name { get; set; }
     
     [JsonProperty("parameter_name1")]
     public string? ParameterName1 { get; set; }

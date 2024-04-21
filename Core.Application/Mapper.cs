@@ -11,7 +11,7 @@ public static class Mapper
     {
         var res = new CommandResponseDto
         {
-            Id = commandResponseJson.Id, Name = commandResponseJson.Name,
+            Id = commandResponseJson.Id, Name = commandResponseJson.Name ?? "Uknown",
             DefaultIntValues = new Dictionary<string, int>(), DefaultStringValues = new Dictionary<string, string>()
         };
 
@@ -47,9 +47,9 @@ public static class Mapper
             CommandId = commandRequestDto.Id
         };
         
-        var intParams = commandRequestDto.IntParams.Cast<int?>().ToList();
+        var intParams = commandRequestDto.IntParams.ToList();
         for (var i = 7; i > commandRequestDto.IntParams.Count - 1; i--)
-            intParams.Add(null);
+            intParams.Add(0);
         
         var stringParams = commandRequestDto.StringParams.Cast<string?>().ToList();
         for (var i = 1; i > commandRequestDto.StringParams.Count - 1; i--)
@@ -69,4 +69,15 @@ public static class Mapper
 
         return res;
     }
+
+    public static TerminalCommandResponseDto TerminalCommandResponseJsonToTerminalCommandResponseDto(
+        TerminalCommandResponseJson terminalCommandResponseJson, string commandName) =>
+        new TerminalCommandResponseDto
+        {
+            Id = terminalCommandResponseJson.Id, TimeCreated = terminalCommandResponseJson.TimeCreated ?? "Unknown",
+            Name = commandName,
+            Parameter1 = terminalCommandResponseJson.Parameter1,
+            Parameter2 = terminalCommandResponseJson.Parameter2, Parameter3 = terminalCommandResponseJson.Parameter3,
+            Status = terminalCommandResponseJson.StateName ?? "Unknown"
+        };
 }

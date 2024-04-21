@@ -13,36 +13,25 @@ public class VendistaApiInteractor : IDisposable
     public async Task<IEnumerable<int>> GetIDsOfAllTerminals() =>
         (await _vendistaApi.GetAllTerminals()).Items!.Select(i => i.Id);
     
-    public async Task<IEnumerable<CommandResponseDto>> GetAllCommands()
+    public async Task<CommandResponseDto[]> GetAllCommands()
     {
         var commandsResponseJson = await _vendistaApi.GetAllCommands();
 
-        var commandResponseDtos = commandsResponseJson.Items.Select(Mapper.CommandResponseJsonToCommandResponseDto).ToArray();
+        var commandResponseDtos = commandsResponseJson.Items?.Select(Mapper.CommandResponseJsonToCommandResponseDto).ToArray() ?? Array.Empty<CommandResponseDto>();
         
         lock (Locker)
         {
             foreach (var commandResponseDto in commandResponseDtos)
-                TerminalNamesByIDs.TryAdd(commandResponseDto.Id, commandResponseDto.Name);
+                CommandNamesByIDs.TryAdd(commandResponseDto.Id, commandResponseDto.Name);
         }
         
         return commandResponseDtos;
     }
-    
-    public async Task<TerminalCommandResponseDto> GetCommandsByTerminal(int terminalId)
-    {
-        var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, VendistaApiUrls.TerminalCommands(_token, terminalId));
-        httpRequestMessage.Headers.Add("Accept", "text/plain");
 
-        var httpResponseMessage = await _httpClient.SendAsync(httpRequestMessage);
-        
-        httpRequestMessage.Dispose();
-
-        var serializedJsonResponse = await httpResponseMessage.Content.ReadAsStringAsync();
-        
-        httpResponseMessage.Dispose();
-
-        return JsonConvert.DeserializeObject<TerminalCommandsJsonResponse>(serializedJsonResponse)!;
-    }
+    public async Task<TerminalCommandResponseDto[]> GetCommandsByTerminal(int terminalId) =>
+        (await _vendistaApi.GetCommandsByTerminal(terminalId)).Items?.Select(i =>
+            Mapper.TerminalCommandResponseJsonToTerminalCommandResponseDto(i, CommandNamesByIDs[i.CommandId])).ToArray() ??
+        Array.Empty<TerminalCommandResponseDto>();
 
     public async Task SendCommandToTerminal(int terminalId, CommandRequestDto commandRequestDto) =>
         await _vendistaApi.SendCommandToTerminal(terminalId,
@@ -52,7 +41,7 @@ public class VendistaApiInteractor : IDisposable
     
     private readonly VendistaApiEntity _vendistaApi;
 
-    private static readonly Dictionary<int, string> TerminalNamesByIDs = new();
+    private static readonly Dictionary<int, string> CommandNamesByIDs = new();
 
     private static readonly object Locker = new();
 }
