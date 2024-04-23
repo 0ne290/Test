@@ -60,7 +60,6 @@
 				intParameterValue.Append($"new Parameter(\"{HttpUtility.JavaScriptStringEncode(commandIntParameter.Key)}\", \"{HttpUtility.JavaScriptStringEncode(commandIntParameter.Value.ToString())}\"), ");
 			intParameterValue.Remove(intParameterValue.Length - 2, 2);
 			intParameterValue.Append("]");
-			Console.WriteLine(intParameterValue.ToString());
 			@:intParameters.set("@command.Id", @Html.Raw(intParameterValue.ToString().Replace("\n", "; ")));
 		}
 
