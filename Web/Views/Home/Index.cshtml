@@ -1,22 +1,24 @@
-﻿@using Core.Application.VendistaApi.Dto.Responses
+﻿@using System.Text
+@using System.Web
+@using Core.Application.VendistaApi.Dto.Responses
 @{
     ViewData["Title"] = "Home Page";
 }
 
 <form style="display: flex; flex-wrap: wrap; flex-direction: row;">
 	<div style="flex-grow: 1">
-		@foreach (var x in (IEnumerable<int>)ViewData["TerminalIDs"]!)
+		@foreach (var terminalId in (IEnumerable<int>)ViewData["TerminalIDs"]!)
 		{
-			<div><label class="custom-radio"><input type="radio" name="terminal" value="@x"><span>@x</span></label></div>
+			<div><label class="custom-radio"><input type="radio" name="terminal" value="@terminalId"><span>@terminalId</span></label></div>
 		}
 	</div>
 	
 	<div style="flex-grow: 1; padding-bottom: 18.7%;">
 		<select class="js-chosen" name="command" placeholder="Выберите команду" id="select" onchange="func()">
 			<option value=""></option>
-			@foreach (var x in (CommandResponseDto[])ViewData["Commands"]!)
+			@foreach (var command in (CommandResponseDto[])ViewData["Commands"]!)
 			{
-				<option value="@x.Id">@x.Name</option>
+				<option value="@command.Id">@command.Name</option>
 			}
 		</select>
 	</div>
@@ -46,10 +48,32 @@
 			return this._defaultValue;
 		}
 	}
+	
+	var stringParameters = new Map();
+	var intParameters = new Map();
+	@foreach (var command in (CommandResponseDto[])ViewData["Commands"]!)
+	{
+		if (command.DefaultIntValues.Count > 0)
+		{
+			var intParameterValue = new StringBuilder("[");
+			foreach (var commandIntParameter in command.DefaultIntValues)
+				intParameterValue.Append($"new Parameter(\"{HttpUtility.JavaScriptStringEncode(commandIntParameter.Key)}\", \"{HttpUtility.JavaScriptStringEncode(commandIntParameter.Value.ToString())}\"), ");
+			intParameterValue.Remove(intParameterValue.Length - 2, 2);
+			intParameterValue.Append("]");
+			Console.WriteLine(intParameterValue.ToString());
+			@:intParameters.set("@command.Id", @Html.Raw(intParameterValue.ToString().Replace("\n", "; ")));
+		}
 
-	var x = new Map();
-	x.set("commandId1", [new Parameter("Кол-во чего-то:", "0"), new Parameter("Мощность чего-то:", "10")]);
-	x.set("commandId2", [new Parameter("Имя чего-то:", "STANDART")]);
+		if (command.DefaultStringValues.Count > 0)
+		{
+			var stringParameterValue = new StringBuilder("[");
+			foreach (var commandstringParameter in command.DefaultStringValues)
+				stringParameterValue.Append($"new Parameter(\"{HttpUtility.JavaScriptStringEncode(commandstringParameter.Key)}\", \"{HttpUtility.JavaScriptStringEncode(commandstringParameter.Value)}\"), ");
+			stringParameterValue.Remove(stringParameterValue.Length - 2, 2);
+			stringParameterValue.Append("]");
+			@:stringParameters.set("@command.Id", @Html.Raw(stringParameterValue.ToString().Replace("\n", "; ")));
+		}
+	}
 	
 	$(document).ready(function()
 	{
@@ -60,15 +84,24 @@
 		});
 	});
 	
+	alert("jjm");
+	
 	var select = document.getElementById("select");
 	var parameters = document.getElementById('parameters');
 	
 	function func()
 	{
 		parameters.innerText = '';
-           for (let i of x.get(select.options[select.selectedIndex].value))
+        for (let i = 0; i < intParameters.get(select.options[select.selectedIndex].value).length; i++)
 		{
-			parameters.insertAdjacentHTML("beforeend", "<div style=\"padding-bottom: 1.2%;\"><p>terminalId1</p><input type=\"text\" name=\"terminal\" value=\"terminalId1\" style=\"border: none;\"></div>");
+			let intParameter = intParameters.get(select.options[select.selectedIndex].value)[i];
+			parameters.insertAdjacentHTML("beforeend", `<div style="padding-bottom: 1.2%;"><p>${intParameter.name}</p><input type="text" name="parameter${i + 1}" value="${intParameter.defaultValue}" style="border: none;"></div>`);
 		}
+		
+        for (let i = 0; i < stringParameters.get(select.options[select.selectedIndex].value).length; i++)
+        {
+        	let stringParameter = stringParameters.get(select.options[select.selectedIndex].value)[i];
+        	parameters.insertAdjacentHTML("beforeend", `<div style="padding-bottom: 1.2%;"><p>${stringParameter.name}</p><input type="text" name="strParameter${i + 1}" value="${stringParameter.defaultValue}" style="border: none;"></div>`);
+        }
 	}
 </script>
