@@ -3,34 +3,72 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-        @foreach (var x in (IEnumerable<int>)ViewData["TerminalIDs"]!)
-        {
-            @x<br>
-        }
-</div>
-<div class="text-center">
-    @{
-        foreach (var x in (CommandResponseDto[])ViewData["Commands"]!)
-        {
-            var xc = "";
-            foreach (var eey1 in x.DefaultIntValues)
-            {
-                xc += eey1.Key + " := ";
-                xc += eey1.Value + "; ";
-            }
+<form style="display: flex; flex-wrap: wrap; flex-direction: row;">
+	<div style="flex-grow: 1">
+		@foreach (var x in (IEnumerable<int>)ViewData["TerminalIDs"]!)
+		{
+			<div><label class="custom-radio"><input type="radio" name="terminal" value="@x"><span>@x</span></label></div>
+		}
+	</div>
+	
+	<div style="flex-grow: 1; padding-bottom: 18.7%;">
+		<select class="js-chosen" name="command" placeholder="Выберите команду" id="select" onchange="func()">
+			<option value=""></option>
+			@foreach (var x in (CommandResponseDto[])ViewData["Commands"]!)
+			{
+				<option value="@x.Id">@x.Name</option>
+			}
+		</select>
+	</div>
+	
+	<div style="flex: 1 0 100%; order: 6" id="parameters">
+		<div style="padding-bottom: 1.2%;"><p>terminalId1</p><input type="text" name="terminal" value="terminalId1" style="border: none;"></div>
+		<div style="padding-bottom: 1.2%"><p>terminalId2</p><input type="text" name="terminal" value="terminalId2" style="border: none;"></div>
+	</div>
+</form>
 
-            var xt = "";
-            foreach (var eey1 in x.DefaultStringValues)
-            {
-                xt += eey1.Key + " := ";
-                xt += eey1.Value + "; ";
-            }
+<script>
+	class Parameter
+	{
+		constructor(name, defaultValue)
+		{
+			this._name = name;
+			this._defaultValue = defaultValue;
+		}
+		
+		get name()
+		{
+			return this._name;
+		}
+		
+		get defaultValue()
+		{
+			return this._defaultValue;
+		}
+	}
 
-            var y = $"{x.Id}; {x.Name}; {{ {xc}}}; {{ {xt}}}";
-
-            @y<br>
-        }
-    }
-    
-</div>
+	var x = new Map();
+	x.set("commandId1", [new Parameter("Кол-во чего-то:", "0"), new Parameter("Мощность чего-то:", "10")]);
+	x.set("commandId2", [new Parameter("Имя чего-то:", "STANDART")]);
+	
+	$(document).ready(function()
+	{
+		$('.js-chosen').chosen({
+			width: '100%',
+			no_results_text: 'Совпадений не найдено',
+			placeholder_text_single: 'Выберите команду'
+		});
+	});
+	
+	var select = document.getElementById("select");
+	var parameters = document.getElementById('parameters');
+	
+	function func()
+	{
+		parameters.innerText = '';
+           for (let i of x.get(select.options[select.selectedIndex].value))
+		{
+			parameters.insertAdjacentHTML("beforeend", "<div style=\"padding-bottom: 1.2%;\"><p>terminalId1</p><input type=\"text\" name=\"terminal\" value=\"terminalId1\" style=\"border: none;\"></div>");
+		}
+	}
+</script>
