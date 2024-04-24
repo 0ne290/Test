@@ -4,7 +4,7 @@ public class CommandRequestDto
 {
     public int Id { get; set; }
 
-    public IList<int> IntParams { get; set; } = Array.Empty<int>();
+    public IList<int> IntParams { get; set; } = new List<int>();
 
-    public IList<string> StringParams { get; set; } = Array.Empty<string>();
+    public IList<string> StringParams { get; set; } = new List<string>();
 }

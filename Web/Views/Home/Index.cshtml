@@ -5,16 +5,16 @@
     ViewData["Title"] = "Home Page";
 }
 
-<form style="display: flex; flex-wrap: wrap; flex-direction: row;">
+<form style="display: flex; flex-wrap: wrap; flex-direction: row;" target="hiddenTarget" action="http://localhost:5150/home/SendCommand">
 	<div style="flex-grow: 1">
 		@foreach (var terminalId in (IEnumerable<int>)ViewData["TerminalIDs"]!)
 		{
-			<div><label class="custom-radio"><input type="radio" name="terminal" value="@terminalId" onchange="func1(this)"><span>@terminalId</span></label></div>
+			<div><label class="custom-radio"><input type="radio" name="terminalId" value="@terminalId" onchange="func1(this)"><span>@terminalId</span></label></div>
 		}
 	</div>
 	
 	<div style="flex-grow: 1; padding-bottom: 18.7%;">
-		<select class="js-chosen" name="command" placeholder="Выберите команду" id="select" onchange="func()">
+		<select class="js-chosen" name="commandId" placeholder="Выберите команду" id="select" onchange="func()">
 			<option value=""></option>
 			@foreach (var command in (CommandResponseDto[])ViewData["Commands"]!)
 			{
@@ -26,8 +26,8 @@
 	<div style="flex: 1 0 100%; order: 6" id="parameters"></div>
 	
 	<div style="flex: 1 0 100%; order: 7; margin-top: 2.4%; text-align: center"><button class="btn" style="width: 33%">Отправить</button></div>
-	
 </form>
+<iframe style="display: none" name="hiddenTarget" id="hiddenTarget" onload="func2()"></iframe>
 
 <table class="sortable" style="margin: auto; padding-top: 4%">
 	<thead>
@@ -117,17 +117,26 @@
         }
 	}
 	
+	var checkedRadio;
+	
 	async function func1(radio)
     {
-		let tableBody = document.getElementById('tableBody');
+		checkedRadio = radio;
 		
-		let response = await fetch(`http://localhost:5150/home/GetCommandsByTerminal?terminalId=${radio.value}`);
-		let json = await response.json();
-		
-		tableBody.innerText = '';
-		for (const command of json)
-		{
-			tableBody.insertAdjacentHTML("beforeend", `<tr><td style="text-align: center">${command.id}</td><td style="text-align: center">${command.time_created}</td><td style="text-align: center">${command.name}</td><td style="text-align: center">${command.parameter1}</td><td style="text-align: center">${command.parameter2}</td><td style="text-align: center">${command.parameter3}</td><td style="text-align: center">${command.status}</td></tr>`)
-		}
+		await func2();
+    }
+	
+	async function func2()
+    {
+ 		let tableBody = document.getElementById('tableBody');
+ 		
+ 		let response = await fetch(`http://localhost:5150/home/GetCommandsByTerminal?terminalId=${checkedRadio.value}`);
+ 		let json = await response.json();
+ 		
+ 		tableBody.innerText = '';
+ 		for (const command of json)
+ 		{
+ 			tableBody.insertAdjacentHTML("beforeend", `<tr><td style="text-align: center">${command.id}</td><td style="text-align: center">${command.time_created}</td><td style="text-align: center">${command.name}</td><td style="text-align: center">${command.parameter1}</td><td style="text-align: center">${command.parameter2}</td><td style="text-align: center">${command.parameter3}</td><td style="text-align: center">${command.status}</td></tr>`)
+ 		}
     }
 </script>

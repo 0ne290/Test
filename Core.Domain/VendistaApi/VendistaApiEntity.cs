@@ -105,8 +105,6 @@ public class VendistaApiEntity : IDisposable
 
         var httpResponseMessage = await _httpClient.SendAsync(httpRequestMessage);
         
-        //Console.WriteLine(await httpResponseMessage.Content.ReadAsStringAsync());
-        
         httpRequestMessage.Dispose();
         httpResponseMessage.Dispose();
     }
