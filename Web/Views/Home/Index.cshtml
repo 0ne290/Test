@@ -5,7 +5,7 @@
     ViewData["Title"] = "Home Page";
 }
 
-<form style="display: flex; flex-wrap: wrap; flex-direction: row;" target="hiddenTarget" action="http://localhost:5150/home/SendCommand">
+<form style="display: flex; flex-wrap: wrap; flex-direction: row;" target="hiddenTarget" action="/home/SendCommand">
 	<div style="flex-grow: 1">
 		@foreach (var terminalId in (IEnumerable<int>)ViewData["TerminalIDs"]!)
 		{
@@ -130,7 +130,7 @@
     {
  		let tableBody = document.getElementById('tableBody');
  		
- 		let response = await fetch(`http://localhost:5150/home/GetCommandsByTerminal?terminalId=${checkedRadio.value}`);
+ 		let response = await fetch(`/home/GetCommandsByTerminal?terminalId=${checkedRadio.value}`);
  		let json = await response.json();
  		
  		tableBody.innerText = '';
