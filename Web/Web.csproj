@@ -18,6 +18,7 @@
 
     <ItemGroup>
       <Folder Include="wwwroot\lib\jquery\" />
+      <Folder Include="wwwroot\lib\sortable\" />
     </ItemGroup>
 
 </Project>
